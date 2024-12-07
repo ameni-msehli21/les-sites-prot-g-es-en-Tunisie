@@ -1,0 +1,226 @@
+<!DOCTYPE html> 
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Les Sites Protégés en Tunisie</title>
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css" />
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <style>
+    .leaflet-control-custom {
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+      line-height: 30px;
+      cursor: pointer;
+      margin: 5px auto;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    .leaflet-control-custom:hover {
+      background-color: #f0f0f0;
+    }
+    .leaflet-control-custom span {
+      font-size: 18px;
+    }
+
+    .tour-button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    .tour-button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <!-- Left Side: Introduction Section -->
+    <section class="introduction animate-left">
+      <h1>Les Sites Protégés en Tunisie</h1>
+      <p>
+        Découvrez les sites naturels et historiques qui rendent la Tunisie unique. 
+        Ces sites protégés témoignent d'un riche patrimoine culturel et écologique.
+      </p>
+      <button class="tour-button" onclick="startTour()">Faire un tour</button>
+    </section>
+
+    <!-- Right Side: Map Section -->
+    <div id="map" class="animate-right"></div>
+  </div>
+
+  <script>
+    // Initialiser la carte
+    var map = L.map('map').setView([34.0, 9.0], 6); // Centrée sur la Tunisie
+
+    // Définir les cartes de base
+    var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    });
+
+    var satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+      maxZoom: 19,
+      subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+      attribution: '© Google Maps'
+    });
+
+    var topoLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+      maxZoom: 17,
+      attribution: '© OpenTopoMap contributors'
+    });
+
+    // Ajouter la carte OpenStreetMap par défaut
+    osmLayer.addTo(map);
+	// Ajouter un contrôle pour changer la carte de base
+    var baseMaps = {
+     "Carte Standard": osmLayer,
+     "Satellite": satelliteLayer,
+     "Topographique": topoLayer
+    };
+
+    // Contrôle de sélection des cartes
+     L.control.layers(baseMaps).addTo(map);
+    // Add GeoServer WMS Layer
+    var wmsLayer = L.tileLayer.wms('http://localhost:8080/geoserver/espace_tun/wms', {
+      layers: 'les_sites',
+      format: 'image/png',
+      transparent: true,
+      attribution: 'GeoServer WMS'
+    });
+    wmsLayer.addTo(map);
+
+    // Define the markers for protected sites
+    var sites = [
+      { name: "Parc National de l'Ichkeul", lat: 37.1636, lng: 9.674835, page: "ichkeul.html" },
+      { name: "Site archéologique de Carthage", lat: 36.852793, lng: 10.323334, page: "carthage.html" },
+      { name: "Médina de Tunis", lat: 36.816663, lng: 10.166677, page: "tunis.html" },
+      { name: "Cité punique de Kerkouane", lat: 36.946385, lng: 11.099179, page: "kerkouane.html" },
+      { name: "Dougga", lat: 36.423609, lng: 9.220287, page: "dougga.html" },
+      { name: "Médina Sousse", lat: 35.827769, lng: 10.638617, page: "sousse.html" },
+      { name: "Kairouan", lat: 35.681675, lng: 10.103887, page: "kairouan.html" },
+      { name: "Amphithéatre d'El Jem", lat: 35.296393, lng: 10.706933, page: "eljem.html" },
+      { name: "Djerba", lat: 33.792416, lng: 11.003972, page: "djerba.html" }
+    ];
+
+    // Add markers to the map with popups
+    sites.forEach(function(site) {
+      L.marker([site.lat, site.lng]).addTo(map)
+        .bindPopup(
+          `<b>${site.name}</b><br>
+          <button onclick="window.location.href='${site.page}'">Plus d'informations</button>`
+        );
+    });
+
+    // Function to start the "tour" of sites
+    function startTour() {
+      var delay = 3000; // Delay between flights (in ms)
+      var flyDuration = 2; // Duration of each flight (in seconds)
+
+      // Disable buttons during the tour
+      document.querySelector(".tour-button").disabled = true;
+
+      sites.forEach(function(site, index) {
+        setTimeout(function() {
+          map.flyTo([site.lat, site.lng], 10, { duration: flyDuration }); // Smoothly fly to site
+          var marker = L.marker([site.lat, site.lng]).addTo(map);
+          marker.bindPopup(`<b>${site.name}</b>`).openPopup();
+        }, delay * index);
+      });
+
+      // After the tour: return to the initial view, remove popups, and add the buttons back
+      setTimeout(function() {
+        map.flyTo([34.0, 9.0], 6, { duration: flyDuration });
+
+        // Close all popups
+        map.eachLayer(function(layer) {
+          if (layer.getPopup) {
+            layer.closePopup();
+          }
+        });
+
+        // Re-enable the "tour" button
+        document.querySelector(".tour-button").disabled = false;
+      }, delay * sites.length);
+    }
+
+    // Function to add custom controls
+    function addCustomControls() {
+      L.Control.Custom = L.Control.extend({
+        onAdd: function(map) {
+          var container = L.DomUtil.create('div');
+
+          // Create Find Location button
+          var findLocationBtn = L.DomUtil.create('div', 'leaflet-control-custom', container);
+          findLocationBtn.innerHTML = '<span>📍</span>'; // Geolocation icon
+          findLocationBtn.title = "Trouver ma position";
+          findLocationBtn.onclick = function() {
+            if (!navigator.geolocation) {
+              alert('La géolocalisation n\'est pas prise en charge par votre navigateur.');
+              return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+              function(position) {
+                var lat = position.coords.latitude;
+                var lng = position.coords.longitude;
+                map.setView([lat, lng], 12); // Zoom in on the user's location
+
+                L.marker([lat, lng]).addTo(map).bindPopup('Vous êtes ici !').openPopup();
+              },
+              function() {
+                alert('Impossible d\'obtenir votre position.');
+              }
+            );
+          };
+
+          // Create Refresh Map button
+          var refreshMapBtn = L.DomUtil.create('div', 'leaflet-control-custom', container);
+          refreshMapBtn.innerHTML = '<span>🔄</span>'; // Refresh icon
+          refreshMapBtn.title = "Rafraîchir la carte";
+          refreshMapBtn.onclick = function() {
+            map.setView([34.0, 9.0], 6); // Reset map to the initial view
+          };
+
+          return container;
+        },
+        onRemove: function(map) {}
+      });
+
+      map.addControl(new L.Control.Custom({ position: 'topleft' }));
+    }
+
+    // Initial load of custom controls
+    addCustomControls();
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,154 @@
+/* General Body Styling */
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+body {
+  background: url('TUNISIE.jpg') no-repeat center center fixed;
+  background-size: cover;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.6);
+  z-index: -1;
+}
+
+/* Layout */
+.main-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1rem;
+  height: 100vh;
+  padding: 1rem;
+}
+
+/* Left Side: Introduction Section with Animation */
+.introduction {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center content vertically */
+  align-items: center; /* Center content horizontally */
+  padding: 2rem;
+  background-color: rgba(40, 48, 72, 0.9);
+  color: #ffffff;
+  border-radius: 10px;
+
+  /* Adjusted height and alignment */
+  height: 80%; /* Still shorter than the right side */
+  max-height: 500px;
+  margin-top: 2rem; /* Push the left side down */
+  position: relative;
+  top: 20px; /* Extra offset to push it a bit further down */
+
+  /* Animation */
+  opacity: 0;
+  transform: translateX(-50px);
+  animation: slideInLeft 1.2s ease-in-out forwards;
+}
+
+.introduction h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  text-align: center; /* Center-align text */
+}
+
+.introduction p {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  margin-bottom: 2rem;
+  text-align: center; /* Center-align paragraph text */
+}
+
+.introduction button {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  /* Center button */
+  align-self: center;
+}
+
+.introduction button:hover {
+  background-color: #218838;
+}
+
+/* Right Side: Map Section */
+#map {
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+.leaflet-popup-content {
+  text-align: center; /* Center-align all text in the popup */
+}
+
+.leaflet-popup-content b {
+  font-size: 1.2rem;
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333; /* Slightly darker text for contrast */
+}
+
+.leaflet-popup-content button {
+  display: inline-block;
+  margin: 10px auto;
+  padding: 10px 15px;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #28a745; /* New color for the button (vibrant orange) */
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease;
+}
+
+.leaflet-popup-content button:hover {
+  background-color: #218838; /* Slightly darker shade of orange when hovered */
+  color: #ffffff;
+}
+  /* Animation */
+  opacity: 0;
+  transform: translateX(50px);
+  animation: slideInRight 1.2s ease-in-out forwards;
+}
+
+/* Animations */
+@keyframes slideInLeft {
+  0% {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  0% {
+    opacity: 0;
+    transform: translateX(50px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+

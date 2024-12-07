@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Djerba</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        /* General Styling */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.8), rgba(0, 0, 0, 0.8)), url('dj1.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #333;
+            animation: fadeIn 2s ease-in-out; /* Page fade-in effect */
+        }
+
+        /* Home Button Styling */
+        .home-button {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            animation: slideIn 1s ease-in-out;
+        }
+
+        .home-button img {
+            height: 50px;
+            width: auto;
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .home-button img:hover {
+            transform: scale(1.1); /* Hover zoom effect */
+        }
+
+        /* Title Styling */
+        .site-title {
+            text-align: center;
+            color: #1e90ff;
+            margin: 1.5rem 0;
+            font-size: 2.5rem;
+            animation: slideInFromTop 1.2s ease-in-out;
+        }
+
+        /* Description Styling */
+        .description-container {
+            padding: 0 20px;
+            margin-bottom: 1.5rem;
+            animation: slideInFromLeft 1.5s ease-in-out;
+        }
+
+        .description {
+            text-align: justify;
+            line-height: 1.6
+			color: #000000;
+        }
+
+        ul {
+            margin-top: 1rem;
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Map and Album Container */
+        .map-and-album-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 20px;
+            animation: fadeInUp 1.5s ease-in-out;
+        }
+
+        /* Map Styling */
+        #map {
+            flex: 1;
+            height: 400px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 1.5s ease-in-out;
+        }
+
+        /* Photo Carousel Styling */
+        .photo-carousel {
+            flex: 1;
+            position: relative;
+            max-width: 100%;
+            height: 400px;
+            overflow: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .carousel-images {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .carousel-images img {
+            flex-shrink: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .carousel-images img.clickable-image:hover {
+            transform: scale(1.05); /* Hover effect for the first image */
+            cursor: pointer;
+        }
+
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(30, 144, 255, 0.8);
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 1.5rem;
+            border-radius: 5px;
+            z-index: 100;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .carousel-button:hover {
+            transform: scale(1.1); /* Button hover effect */
+            background: rgba(0, 86, 179, 0.8);
+        }
+
+        #prev-button {
+            left: 10px;
+        }
+
+        #next-button {
+            right: 10px;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes slideInFromTop {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInFromLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .map-and-album-container {
+                flex-direction: column;
+            }
+
+            #map,
+            .photo-carousel {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Home Button -->
+    <div class="home-button">
+        <a href="index.html">
+            <img src="home.jpg" alt="Home Button">
+        </a>
+    </div>
+
+    <!-- Title -->
+    <h1 class="site-title">Djerba</h1>
+
+    <!-- Description -->
+<div class="description-container">
+    <p class="description">
+        Djerba, située dans le golfe de Gabès en Tunisie, est la plus grande île de l'Afrique du Nord. Elle a été inscrite au patrimoine mondial de l'UNESCO en 2023 en tant que témoignage d'un mode d'occupation d'un territoire insulaire.
+    </p>
+    <ul>
+        <li><b>Histoire ancienne :</b> Selon Homère, Djerba serait l'île des lotophages mentionnée dans l'Odyssée. Les Phéniciens, les Grecs et les Romains ont tous laissé leur empreinte sur cette île fascinante.</li>
+        <li><b>Commerce et agriculture :</b> Sous l'égide de Carthage, Djerba était un point de transit clé entre les pays subsahariens et la Méditerranée. Les Romains y ont développé l'agriculture, notamment la culture de l'olivier.</li>
+        <li><b>Conquêtes et influences :</b> L'île a été conquise par diverses civilisations au fil des siècles, notamment les Arabes en 667 après J.-C., les Vandales, les Byzantins, les Normands, les Siciliens et les Espagnols.</li>
+        <li><b>Culture et religion :</b> Djerba est célèbre pour sa synagogue El Ghriba, l'une des plus anciennes au monde, existant depuis environ 26 siècles. Bien que la majorité de la population soit musulmane, l'île abrite également une petite communauté juive.</li>
+    </ul>
+    <p class="description">
+        Djerba offre un exemple unique de la manière dont un territoire insulaire peut être habité et développé au fil des siècles. Sa riche histoire et sa diversité culturelle en font une destination incontournable.
+    </p>
+</div>
+
+
+
+
+
+
+    <!-- Map and Photo Album Container -->
+    <div class="map-and-album-container">
+        <!-- Map -->
+        <div id="map"></div>
+
+        <!-- Photo Album -->
+        <div class="photo-carousel" aria-label="Photo Carousel">
+            <button id="prev-button" class="carousel-button" aria-label="Previous Image">⟨</button>
+            <div class="carousel-images">
+                <img src="dj2.jpg" alt="Scenic view of Ichkeul" class="clickable-image">
+                <img src="dj3.jpg" alt="Wildlife in Ichkeul">
+                <img src="dj4.jpg" alt="Marshes of Ichkeul">
+                <img src="dj5.jpg" alt="Sunset at Ichkeul">
+            </div>
+            <button id="next-button" class="carousel-button" aria-label="Next Image">⟩</button>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the map
+        var map = L.map('map', {
+            center: [33.792416, 11.003972],
+            zoom: 12,
+            dragging: false,
+            scrollWheelZoom: false,
+		    minZoom: 12, // Set the minimum zoom level to lock zoom-out
+            maxZoom: 19
+        });
+
+        // Définir les cartes de base
+        var osmLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        });
+
+        var satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+            maxZoom: 19,
+            subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+            attribution: '© Google Maps'
+        });
+
+        var topoLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+            maxZoom: 17,
+           attribution: '© OpenTopoMap contributors'
+        });
+
+         // Ajouter la carte OpenStreetMap par défaut
+           osmLayer.addTo(map);
+	// Ajouter un contrôle pour changer la carte de base
+    var baseMaps = {
+     "Carte Standard": osmLayer,
+     "Satellite": satelliteLayer,
+     "Topographique": topoLayer
+    };
+
+    // Contrôle de sélection des cartes
+     L.control.layers(baseMaps).addTo(map);;
+
+        var marker = L.marker([33.792416, 11.003972]).addTo(map);
+        marker.bindPopup(`
+            <h3> Djerba</h3>
+            <p>Coordonnées: 33.792416, 11.003972</p>
+        `);
+
+        // Photo Carousel with Special Behavior
+        const imagesContainer = document.querySelector('.carousel-images');
+        const images = Array.from(imagesContainer.querySelectorAll('img'));
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+
+        let currentIndex = 0;
+
+        function updateCarousel() {
+            const imageWidth = imagesContainer.querySelector('img').clientWidth;
+            imagesContainer.style.transform = `translateX(-${currentIndex * imageWidth}px)`;
+        }
+
+        prevButton.addEventListener('click', () => {
+            currentIndex = (currentIndex === 0) ? images.length - 1 : currentIndex - 1;
+            updateCarousel();
+        });
+
+        nextButton.addEventListener('click', () => {
+            currentIndex = (currentIndex === images.length - 1) ? 0 : currentIndex + 1;
+            updateCarousel();
+        });
+
+        images[0].addEventListener('click', () => {
+            currentIndex = 1;
+            updateCarousel();
+            setTimeout(() => {
+                currentIndex = 2;
+                updateCarousel();
+            }, 300);
+        });
+
+        updateCarousel();
+        window.addEventListener('resize', updateCarousel);
+    </script>
+</body>
+</html>
